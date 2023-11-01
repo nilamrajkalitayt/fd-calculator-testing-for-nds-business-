@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Fixed Deposit Calculator</title>
+  <meta name="description" content="Calculate the returns and total value of your fixed deposit investment.">
+  <meta name="keywords" content="fixed deposit calculator, investment calculator, interest calculator, financial calculator">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    body {
+      background-image: url('background.png');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-color: #f8f9fa;
+    }
+    .container {
+      max-width: 500px;
+      margin: 50px auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      background-color: #fff;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #333;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    form {
+      margin-bottom: 30px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      font-weight: bold;
+      color: #555;
+    }
+    input[type="number"] {
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 8px;
+      width: 100%;
+    }
+    .btn-primary {
+      background-color: #007bff;
+      border-color: #007bff;
+      font-weight: bold;
+    }
+    .btn-primary:hover {
+      background-color: #0056b3;
+      border-color: #0056b3;
+    }
+    #result {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    canvas {
+      margin: 0 auto;
+      display: block;
+    }
+    .watermark {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      font-size: 12px;
+      color: rgba(0, 0, 0, 0.3);
+    }
+    #investmentAmountText,
+    #interestRateText,
+    #timePeriodText {
+      text-align: center;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Fixed Deposit Calculator</h1>
+    <form id="fdCalculatorForm">
+      <div class="form-group">
+        <label for="investmentInput">Investment Amount:</label>
+        <input type="number" class="form-control" id="investmentInput" required>
+      </div>
+      <div class="form-group">
+        <label for="interestInput">Interest Rate (%):</label>
+        <input type="number" class="form-control" id="interestInput" required>
+      </div>
+      <div class="form-group">
+        <label for="timeInput">Time Period (years):</label>
+        <input type="number" class="form-control" id="timeInput" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Calculate</button>
+    </form>
+    <div id="result"></div>
+    <canvas id="chart" width="400" height="400"></canvas>
+  </div>
+
+  <div class="watermark">Calculator made by Nilam Direct Business Ltd</div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    $(document).ready(function() {
+      $('#fdCalculatorForm').submit(function(event) {
+        event.preventDefault(); // Prevent the default form submission behavior
+        calculateFD();
+      });
+
+      $('#investmentInput').on('input', function() {
+        var investmentAmount = $(this).val();
+        $('#investmentAmountText').text('Investment Amount: ₹' + numberWithCommas(investmentAmount));
+      });
+
+      $('#interestInput').on('input', function() {
+        var interestRate = $(this).val();
+        $('#interestRateText').text('Interest Rate: ' + interestRate + '%');
+      });
+
+      $('#timeInput').on('input', function() {
+        var timePeriod = $(this).val();
+        $('#timePeriodText').text('Time Period: ' + timePeriod + ' years');
+      });
+
+      function calculateFD() {
+        var investment = parseFloat($('#investmentInput').val());
+        var interestRate = parseFloat($('#interestInput').val());
+        var timePeriod = parseFloat($('#timeInput').val());
+
+        var returns = investment * (1 + (interestRate / 100)) ** timePeriod;
+        var totalValue = investment + returns;
+
+        $('#result').html(`
+          <p>Invested amount: ₹${numberWithCommas(investment)}</p>
+          <p>Est. returns: ₹${numberWithCommas(returns.toFixed(2))}</p>
+          <p>Total value: ₹${numberWithCommas(totalValue.toFixed(2))}</p>
+        `);
+
+        var ctx = document.getElementById('chart').getContext('2d');
+        var chart = new Chart(ctx, {
+          type: 'pie',
+          data: {
+            labels: ['Invested amount', 'Est. returns'],
+            datasets: [{
+              data: [investment, returns],
+              backgroundColor: ['#007bff', '#28a745']
+            }]
+          }
+        });
+      }
+
+      function numberWithCommas(x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      }
+    });
+  </script>
+</body>
+</html>
